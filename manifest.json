@@ -1,0 +1,12 @@
+{
+  "manifest_version": 2,
+  "name": "filter-youtube-subscriptions",
+  "version": "0.0.0",
+  "description": "Do not get bothered by unwanted videos in your YouTube feed",
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/feed/subscriptions"],
+      "js": ["index.js"]
+    }
+  ]
+}
