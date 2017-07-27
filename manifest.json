@@ -3,6 +3,9 @@
   "name": "filter-youtube-subscriptions",
   "version": "0.0.0",
   "description": "Do not get bothered by unwanted videos in your YouTube feed",
+  "browser_action": {
+    "default_popup": "popup/index.html"
+  },
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/feed/subscriptions"],
