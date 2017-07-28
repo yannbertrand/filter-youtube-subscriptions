@@ -2,7 +2,7 @@ var browser = browser || chrome
 
 let filters = []
 
-browser.runtime.sendMessage('get-filters', getFilters)
+browser.runtime.sendMessage({ type: 'get-filters' }, getFilters)
 browser.runtime.onMessage.addListener(getFilters)
 
 function getFilters(upToDateFilters) {
