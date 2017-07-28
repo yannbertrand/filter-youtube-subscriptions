@@ -2,10 +2,16 @@ var browser = browser || chrome
 
 let filters = []
 
-browser.runtime.onMessage.addListener(getFilters)
+browser.runtime.onMessage.addListener(handleMessage)
 
-function getFilters(request, sender, sendResponse) {
-  updateFilters(sendResponse)
+function handleMessage(request, sender, sendResponse) {
+  if (request.type === 'get-filters') {
+    updateFilters(sendResponse)
+  } else if (request.type === 'set-filters') {
+    filters = request.filters
+    browser.storage.sync.set({ filters })
+    refreshPageFilters()
+  }
 
   return true
 }
