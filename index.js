@@ -1,53 +1,131 @@
 var browser = browser || chrome
 
-let filters = []
+class VideosDisplayManager {
 
-browser.runtime.sendMessage({ type: 'get-filters' }, getFilters)
-browser.runtime.onMessage.addListener(getFilters)
+  constructor(browser) {
+    this.filters          = []
+    this.upperCaseFilters = []
 
-function getFilters(upToDateFilters) {
-  filters = upToDateFilters
-  hideVideos()
-}
+    browser.runtime.sendMessage({ type: 'get-filters' }, (filters) => this.updateFilters(filters))
+    browser.runtime.onMessage.addListener((filters) => this.updateFilters(filters))
+  }
 
-function hideVideos() {
-  const noFilter = filters.length
-  const lis = document.getElementsByClassName('yt-shelf-grid-item')
-  const videosToHide = filters.map(title => title.toUpperCase())
-  const regex = new RegExp(videosToHide.join('|'))
-  const displayedVideos = []
-  const hiddenVideos = []
+  updateFilters(upToDateFilters) {
+    this.filters = upToDateFilters
+    this.manageVideosDisplay()
+  }
 
-  for (const li of lis) {
-    const title = li.querySelector('h3 > a').innerHTML
-    const upperCaseTitle = title.toUpperCase()
-    if (noFilter && regex.test(upperCaseTitle)) {
-      if (li.style.display !== 'none') {
-        hiddenVideos.push(title)
-        li.style.display = 'none'
-      }
-    } else {
-      if (li.style.display === 'none') {
-        displayedVideos.push(title)
-        li.style.display = 'inline-block'
+  manageVideosDisplay() {
+    const { videosToHide, videosToDisplay } = this.getVideosToHideAndDisplay()
+
+    this.hideVideos(videosToHide)
+    this.displayVideos(videosToDisplay)
+  }
+
+  hideVideos(videos) {
+    console.groupCollapsed(`Hiding ${videos.length} videos`)
+
+    for (const video of videos) {
+      console.info(video.title)
+      video.hide()
+    }
+
+    console.groupEnd()
+  }
+
+  displayVideos(videos) {
+    console.groupCollapsed(`Displaying ${videos.length} videos`)
+
+    for (const video of videos) {
+      console.info(video.title)
+      video.display()
+    }
+
+    console.groupEnd()
+  }
+
+  getVideosToHideAndDisplay() {
+    const videos          = new YoutubeVideosFinder().find()
+    const videosToHide    = []
+    const videosToDisplay = []
+
+    for (const video of videos) {
+      if (this.thereIsFilters() && this.titleMatchFilters(video.title)) {
+        if (video.isDisplayed()) {
+          videosToHide.push(video)
+        }
+      } else {
+        if (video.isHidden()) {
+          videosToDisplay.push(video)
+        }
       }
     }
+
+    return { videosToHide, videosToDisplay }
   }
 
-  logVideosStateChange('Hiding', hiddenVideos)
-  logVideosStateChange('Displaying', displayedVideos)
+  thereIsFilters() {
+    return this.filters.length > 0
+  }
+
+  titleMatchFilters(title) {
+    const isTitleFinderRegexUndefined = typeof this.titleFinderRegex === undefined
+    const upperCaseFilters            = this.filters.map(title => title.toUpperCase())
+    const upperCaseFiltersHaveChanged = ! areArraysEqual(this.upperCaseFilters, upperCaseFilters)
+
+    // Optimize by not recreating a new RegExp at each iteration
+    if (isTitleFinderRegexUndefined || upperCaseFiltersHaveChanged) {
+      this.upperCaseFilters = upperCaseFilters
+      this.titleFinderRegex = new RegExp(upperCaseFilters.join('|'))
+    }
+
+    return this.titleFinderRegex.test(title.toUpperCase())
+  }
+
 }
 
-function logVideosStateChange(verb, videos) {
-  if (videos.length === 0) {
-    return
+class YoutubeVideosFinder {
+
+  find() {
+    const lis = document.getElementsByClassName('yt-shelf-grid-item')
+    const videos = []
+
+    for (const li of lis) {
+      videos.push(new YoutubeVideo(li))
+    }
+
+    return videos
   }
 
-  console.groupCollapsed(`${verb} ${videos.length} videos`)
-
-  for (const title of videos) {
-    console.info(title)
-  }
-
-  console.groupEnd()
 }
+
+class YoutubeVideo {
+
+  constructor(element) {
+    this.element = element
+    this.title   = element.querySelector('h3 > a').innerHTML
+  }
+
+  display() {
+    this.element.style.display = 'inline-block'
+  }
+
+  hide() {
+    this.element.style.display = 'none'
+  }
+
+  isDisplayed() {
+    return this.element.style.display !== 'none'
+  }
+
+  isHidden() {
+    return this.element.style.display === 'none'
+  }
+
+}
+
+function areArraysEqual(firstArray, secondArray) {
+  return firstArray.length === secondArray.length && firstArray.every((value, index) => value === secondArray[index])
+}
+
+const videosManager = new VideosDisplayManager(browser)
