@@ -39,13 +39,15 @@ function hideVideos() {
 }
 
 function logVideosStateChange(verb, videos) {
-  if (videos.length > 0) {
-    console.groupCollapsed(`${verb} ${videos.length} videos`)
-
-    for (const title of videos) {
-      console.info(title)
-    }
-
-    console.groupEnd()
+  if (videos.length === 0) {
+    return
   }
+
+  console.groupCollapsed(`${verb} ${videos.length} videos`)
+
+  for (const title of videos) {
+    console.info(title)
+  }
+
+  console.groupEnd()
 }
