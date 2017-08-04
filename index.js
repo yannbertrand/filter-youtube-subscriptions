@@ -29,11 +29,12 @@ function hideVideos() {
   const videos = {}
   const displayedVideos = []
   const hiddenVideos = []
+  const regex = new RegExp(videosToHide.join('|'))
 
   for (const li of lis) {
     const title = li.querySelector('h3 > a').innerHTML
     const upperCaseTitle = title.toUpperCase()
-    if (new RegExp(videosToHide.join('|')).test(upperCaseTitle)) {
+    if (regex.test(upperCaseTitle)) {
       hiddenVideos.push(title)
       li.style.display = 'none'
     } else if (li.style.display === 'none') {
