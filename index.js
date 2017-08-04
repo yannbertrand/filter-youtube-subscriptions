@@ -42,21 +42,16 @@ function hideVideos() {
     }
   }
 
-  if (hiddenVideos.length > 0) {
-    console.groupCollapsed(`Hiding ${hiddenVideos.length} videos`)
+  logVideosStateChange('Hiding', hiddenVideos)
+  logVideosStateChange('Displaying', displayedVideos)
+}
 
-    for (const title of hiddenVideos) {
-      console.log(title)
-    }
+function logVideosStateChange(verb, videos) {
+  if (videos.length > 0) {
+    console.groupCollapsed(`${verb} ${videos.length} videos`)
 
-    console.groupEnd()
-  }
-
-  if (displayedVideos.length > 0) {
-    console.groupCollapsed(`Displaying ${displayedVideos.length} videos`)
-
-    for (const title of displayedVideos) {
-      console.log(title)
+    for (const title of videos) {
+      console.info(title)
     }
 
     console.groupEnd()
