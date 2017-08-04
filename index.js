@@ -2,7 +2,8 @@ var browser = browser || chrome
 
 class VideosDisplayManager {
 
-  constructor(browser) {
+  constructor(browser, videosFinder) {
+    this.videosFinder     = videosFinder
     this.filters          = []
     this.upperCaseFilters = []
 
@@ -45,7 +46,7 @@ class VideosDisplayManager {
   }
 
   getVideosToHideAndDisplay() {
-    const videos          = new YoutubeVideosFinder().find()
+    const videos          = this.videosFinder.find()
     const videosToHide    = []
     const videosToDisplay = []
 
@@ -128,4 +129,5 @@ function areArraysEqual(firstArray, secondArray) {
   return firstArray.length === secondArray.length && firstArray.every((value, index) => value === secondArray[index])
 }
 
-const videosManager = new VideosDisplayManager(browser)
+const youtubeVideosFinder = new YoutubeVideosFinder()
+const videosManager = new VideosDisplayManager(browser, youtubeVideosFinder)
