@@ -3,11 +3,11 @@ var browser = browser || chrome
 const form = document.forms[0]
 const filtersInput = form.elements[0]
 
-browser.runtime.sendMessage({ type: 'get-filters' }, getFilters)
+browser.runtime.sendMessage({ type: 'get-filters' }, setInputValue)
 
 form.addEventListener('submit', submit)
 
-function getFilters(filters) {
+function setInputValue(filters) {
   filtersInput.value = filters.join(', ')
 }
 
@@ -15,7 +15,7 @@ function submit(event) {
   event.preventDefault()
 
   const filters = getFiltersFromInputValue(filtersInput.value)
-  getFilters(filters)
+  setInputValue(filters)
   browser.runtime.sendMessage({ type: 'set-filters', filters })
 
   function getFiltersFromInputValue(filtersString) {
