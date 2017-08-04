@@ -11,35 +11,26 @@ function getFilters(upToDateFilters) {
 }
 
 function hideVideos() {
+  const noFilter = filters.length
   const lis = document.getElementsByClassName('yt-shelf-grid-item')
-
-  if (filters.length === 1 && filters[0].length === 0) {
-    for (const li of lis) {
-      if (li.style.display === 'none') {
-        const title = li.querySelector('h3 > a').innerHTML
-        console.log('Displaying "' + title + '"')
-        li.style.display = 'inline-block'
-      }
-    }
-
-    return
-  }
-
   const videosToHide = filters.map(title => title.toUpperCase())
-  const videos = {}
+  const regex = new RegExp(videosToHide.join('|'))
   const displayedVideos = []
   const hiddenVideos = []
-  const regex = new RegExp(videosToHide.join('|'))
 
   for (const li of lis) {
     const title = li.querySelector('h3 > a').innerHTML
     const upperCaseTitle = title.toUpperCase()
-    if (regex.test(upperCaseTitle)) {
-      hiddenVideos.push(title)
-      li.style.display = 'none'
-    } else if (li.style.display === 'none') {
-      displayedVideos.push(title)
-      li.style.display = 'inline-block'
+    if (noFilter && regex.test(upperCaseTitle)) {
+      if (li.style.display !== 'none') {
+        hiddenVideos.push(title)
+        li.style.display = 'none'
+      }
+    } else {
+      if (li.style.display === 'none') {
+        displayedVideos.push(title)
+        li.style.display = 'inline-block'
+      }
     }
   }
 
