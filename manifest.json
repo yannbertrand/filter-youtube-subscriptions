@@ -10,7 +10,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/feed/subscriptions"],
-      "js": ["index.js"]
+      "js": ["youtubeVideosFinder.js", "videosDisplayManager.js", "index.js"]
     }
   ],
   "background": {
