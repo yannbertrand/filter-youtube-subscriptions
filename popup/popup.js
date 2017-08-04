@@ -15,9 +15,13 @@ function submit(event) {
   event.preventDefault()
 
   const filters = getFiltersFromInputValue(filtersInput.value)
+  getFilters(filters)
   browser.runtime.sendMessage({ type: 'set-filters', filters })
 
   function getFiltersFromInputValue(filtersString) {
-    return filtersString.split(',').map(filterString => filterString.trim())
+    return filtersString
+      .split(',')
+      .map(filterString => filterString.trim())
+      .filter(filterString => filterString.length > 0)
   }
 }
