@@ -1,12 +1,9 @@
 class VideosDisplayManager {
 
-  constructor(browser, videosFinder) {
+  constructor(videosFinder) {
     this.videosFinder     = videosFinder
     this.filters          = []
     this.upperCaseFilters = []
-
-    browser.runtime.sendMessage({ type: 'get-filters' }, (filters) => this.updateFilters(filters))
-    browser.runtime.onMessage.addListener((filters) => this.updateFilters(filters))
   }
 
   updateFilters(upToDateFilters) {
